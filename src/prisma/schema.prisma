@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now()) @map("created_at")
+  logs      CommandLog[]
+
+  @@map("users")
+}
+
+model CommandLog {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  command   String
+  output    String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("command_logs")
+}
